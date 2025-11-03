@@ -15,6 +15,11 @@ export default defineConfig({
     // HOW: Simulates browser in Node.js
     environment: 'jsdom',
 
+    // WHAT: Use threads pool for better ESM compatibility
+    // WHY: Fixes jsdom CommonJS/ESM issues in CI environments
+    // HOW: Threads pool handles module loading better than forks
+    pool: 'threads',
+
     // WHAT: Handle ESM/CJS compatibility
     // WHY: jsdom has CommonJS deps that need special handling in ESM
     // HOW: Inline these dependencies during bundling

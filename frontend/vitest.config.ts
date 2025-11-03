@@ -10,22 +10,11 @@ export default defineConfig({
     // WHY: No need to import describe, it, expect
     globals: true,
 
-    // WHAT: Use jsdom environment
+    // WHAT: Use happy-dom environment
     // WHY: React needs browser-like environment (DOM, window, document)
     // HOW: Simulates browser in Node.js
-    environment: 'jsdom',
-
-    // WHAT: Use threads pool for better ESM compatibility
-    // WHY: Fixes jsdom CommonJS/ESM issues in CI environments
-    // HOW: Threads pool handles module loading better than forks
-    pool: 'threads',
-
-    // WHAT: Handle ESM/CJS compatibility
-    // WHY: jsdom has CommonJS deps that need special handling in ESM
-    // HOW: Inline these dependencies during bundling
-    deps: {
-      inline: [/jsdom/, /whatwg-url/, /webidl-conversions/],
-    },
+    // NOTE: happy-dom is faster and has better ESM support than jsdom
+    environment: 'happy-dom',
 
     // WHAT: Setup file for React Testing Library
     // WHY: Configure matchers like toBeInTheDocument()

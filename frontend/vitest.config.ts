@@ -15,6 +15,13 @@ export default defineConfig({
     // HOW: Simulates browser in Node.js
     environment: 'jsdom',
 
+    // WHAT: Handle ESM/CJS compatibility
+    // WHY: jsdom has CommonJS deps that need special handling in ESM
+    // HOW: Inline these dependencies during bundling
+    deps: {
+      inline: [/jsdom/, /whatwg-url/, /webidl-conversions/],
+    },
+
     // WHAT: Setup file for React Testing Library
     // WHY: Configure matchers like toBeInTheDocument()
     // HOW: Runs before all tests

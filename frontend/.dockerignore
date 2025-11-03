@@ -1,0 +1,92 @@
+# ============================================
+# Frontend .dockerignore
+# ============================================
+# Excludes files from being copied to Docker image
+
+# WHAT: Ignore node_modules
+# WHY: We'll install fresh in container
+#      - Faster builds (don't copy thousands of files)
+#      - Correct platform (Linux in container vs Mac/Windows on host)
+#      - Clean install every time
+node_modules
+
+# WHAT: Ignore npm/yarn logs
+# WHY: Don't need debug logs in container
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# WHAT: Ignore build output
+# WHY: We'll build fresh in container (or won't build in dev mode)
+#      Old builds from your Mac shouldn't be in container
+dist
+dist-ssr
+build
+.next
+out
+
+# WHAT: Ignore environment files
+# WHY: Security - environment variables should be passed at runtime
+#      Not baked into the image
+.env
+.env.local
+.env.*.local
+
+# WHAT: Ignore git files
+# WHY: Don't need version control inside container
+.git
+.gitignore
+
+# WHAT: Ignore test files
+# WHY: Tests don't run in production container
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+coverage
+.nyc_output
+
+# WHAT: Ignore IDE/editor files
+# WHY: Personal editor settings not needed in container
+.vscode
+.idea
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# WHAT: Ignore Docker files
+# WHY: Don't need Dockerfile inside the image it's building
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# WHAT: Ignore documentation
+# WHY: Runtime doesn't need docs
+README.md
+*.md
+
+# WHAT: Ignore cache directories
+# WHY: Vite and other tools create caches
+#      Fresh cache in container is better
+.cache
+.vite
+.turbo
+.parcel-cache
+
+# WHAT: Ignore local TypeScript build info
+# WHY: Will be regenerated in container
+*.tsbuildinfo
+
+# WHAT: Ignore Storybook (if you add it later)
+# WHY: Development tool, not needed in container
+storybook-static
+.storybook
+
+# WHAT: Ignore temp files
+# WHY: Operating system temporary files
+*.tmp
+*.temp
+.tmp

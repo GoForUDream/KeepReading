@@ -1,0 +1,33 @@
+{
+  "name": "keep-reading",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Keep Reading - Professional Bookstore Application",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "predev": "npm run validate",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "validate": "npm run validate:backend && npm run validate:frontend",
+    "validate:backend": "npm run validate --workspace=backend",
+    "validate:frontend": "npm run validate --workspace=frontend",
+    "type-check": "npm run type-check --workspaces",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "install:all": "npm install && npm install --workspaces",
+    "build": "npm run build --workspaces",
+    "build:backend": "npm run build --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

@@ -1,22 +1,229 @@
+# ============================================
+# Docker Compose Configuration
+# ============================================
+# This file defines and connects all services (containers)
+# Run with: docker compose up
+# Stop with: CTRL+C or docker compose down
+
 services:
+  # ==========================================
+  # PostgreSQL Database Service
+  # ==========================================
   postgres:
+    # WHAT: Use official PostgreSQL 17 Alpine image
+    # WHY: Alpine is smaller, lighter, more secure
+    # HOW: Docker Hub automatically pulls this image
     image: postgres:17-alpine
+
+    # WHAT: Custom container name
+    # WHY: Easier to identify in docker ps
+    # HOW: Instead of random name, uses keep-reading-db
     container_name: keep-reading-db
+
+    # WHAT: Restart policy
+    # WHY: If database crashes, automatically restart it
+    #      "unless-stopped" = restart unless you manually stopped it
+    # HOW: Docker monitors and restarts if needed
     restart: unless-stopped
+
+    # WHAT: Port mapping
+    # WHY: Makes PostgreSQL accessible from your Mac
+    # HOW: Maps host port 5433 → container port 5432
+    #      Why 5433? You already have something on 5432
     ports:
       - "5433:5432"
+
+    # WHAT: Environment variables
+    # WHY: Configures PostgreSQL on startup
+    # HOW: PostgreSQL image reads these variables
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: keep_reading
+      POSTGRES_USER: postgres          # Database username
+      POSTGRES_PASSWORD: postgres      # Database password
+      POSTGRES_DB: keep_reading        # Database name
+
+    # WHAT: Data persistence
+    # WHY: Without this, data is lost when container stops!
+    # HOW: Mounts a Docker volume to PostgreSQL data directory
+    #      Data stored in volume persists across restarts
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    # WHAT: Health check
+    # WHY: Let Docker know when database is ready
+    #      Other services can wait for it to be healthy
+    # HOW: Runs pg_isready command every 10 seconds
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 10s      # Check every 10 seconds
+      timeout: 5s        # Fail if command takes >5 seconds
+      retries: 5         # Try 5 times before marking unhealthy
 
+    # WHAT: Connect to network
+    # WHY: Allows other services to communicate with database
+    # HOW: Joins the 'app-network' (defined below)
+    networks:
+      - app-network
+
+  # ==========================================
+  # Backend API Service
+  # ==========================================
+  backend:
+    # WHAT: Build from Dockerfile instead of pulling image
+    # WHY: Our custom app, not a pre-made image
+    # HOW: Docker reads backend/Dockerfile and builds it
+    build:
+      context: ./backend       # Where to find Dockerfile
+      dockerfile: Dockerfile   # Name of the Dockerfile
+
+    # WHAT: Container name
+    # WHY: Easy identification
+    container_name: keep-reading-backend
+
+    # WHAT: Restart policy
+    # WHY: Auto-restart if backend crashes
+    restart: unless-stopped
+
+    # WHAT: Port mapping
+    # WHY: Makes backend API accessible from your Mac
+    # HOW: Maps host port 4000 → container port 4000
+    #      Now you can access http://localhost:4000
+    ports:
+      - "4000:4000"
+
+    # WHAT: Environment variables
+    # WHY: Configure backend at runtime (not baked into image)
+    # HOW: Backend reads these from process.env
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      # IMPORTANT: Database connection
+      # WHY use 'postgres:5432' not 'localhost:5433'?
+      # Inside Docker network, services talk to each other by name
+      # 'postgres' = name of postgres service (above)
+      # Port is 5432 (internal), not 5433 (external)
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/keep_reading?schema=public"
+      CORS_ORIGIN: http://localhost:5173
+
+    # WHAT: Depends on postgres
+    # WHY: Backend needs database to be running first
+    # HOW: Docker starts postgres before backend
+    #      Also waits for postgres to be healthy
+    depends_on:
+      postgres:
+        condition: service_healthy    # Wait for health check to pass
+
+    # WHAT: Volume for development
+    # WHY: Hot reload - changes on your Mac reflect in container
+    # HOW: Mounts ./backend on your Mac to /app in container
+    #      When you edit a file, container sees the change immediately
+    # NOTE: We exclude node_modules (use container's version)
+    volumes:
+      - ./backend:/app              # Sync code
+      - /app/node_modules           # Don't sync node_modules
+      - /app/dist                   # Don't sync build output
+
+    # WHAT: Join network
+    # WHY: Talk to postgres and frontend
+    networks:
+      - app-network
+
+    # WHAT: Command override for development
+    # WHY: Use dev mode with hot reload instead of production mode
+    # HOW: Overrides CMD from Dockerfile
+    #      tsx watch = TypeScript executor with hot reload
+    command: npx tsx watch src/index.ts
+
+  # ==========================================
+  # Frontend React App Service
+  # ==========================================
+  frontend:
+    # WHAT: Build from Dockerfile
+    # WHY: Our custom React app
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    # WHAT: Container name
+    container_name: keep-reading-frontend
+
+    # WHAT: Restart policy
+    restart: unless-stopped
+
+    # WHAT: Port mapping
+    # WHY: Access frontend from your Mac browser
+    # HOW: Maps port 5173 (Vite default)
+    ports:
+      - "5173:5173"
+
+    # WHAT: Environment variables
+    # WHY: Configure Vite and app
+    environment:
+      # These can be accessed in React with import.meta.env
+      VITE_API_URL: http://localhost:4000
+
+    # WHAT: Depends on backend
+    # WHY: Frontend needs backend API to work
+    # HOW: Starts backend first
+    depends_on:
+      - backend
+
+    # WHAT: Volume for hot reload
+    # WHY: Changes in code immediately update in browser
+    # HOW: Syncs your local files with container
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules       # Use container's node_modules
+      - /app/dist               # Use container's build output
+
+    # WHAT: Join network
+    networks:
+      - app-network
+
+    # WHAT: Keep stdin open and allocate TTY
+    # WHY: Allows interactive terminal (useful for debugging)
+    # HOW: Docker flags
+    stdin_open: true
+    tty: true
+
+# ==========================================
+# Networks
+# ==========================================
+# WHAT: Define custom network
+# WHY: Isolates our app's containers
+#      They can talk to each other but not to other Docker containers
+# HOW: Docker creates a virtual network
+networks:
+  app-network:
+    driver: bridge    # Bridge = standard Docker network type
+
+# ==========================================
+# Volumes
+# ==========================================
+# WHAT: Define named volumes for data persistence
+# WHY: Data survives container restarts/deletions
+# HOW: Docker manages storage on your disk
 volumes:
   postgres_data:
-    driver: local
+    driver: local     # Stores on your local disk
+
+# ==========================================
+# HOW SERVICES COMMUNICATE
+# ==========================================
+#
+# From Your Mac:
+#   → http://localhost:5173 → frontend container
+#   → http://localhost:4000 → backend container
+#   → localhost:5433 → postgres container
+#
+# Inside Docker Network:
+#   Frontend → http://backend:4000 → Backend
+#   Backend → postgres:5432 → PostgreSQL
+#
+# Why different?
+#   - Your Mac: Uses exposed ports (5173, 4000, 5433)
+#   - Container to Container: Uses service names + internal ports
+#
+# Example:
+#   You visit: http://localhost:5173 (frontend)
+#   Frontend calls: http://localhost:4000 (backend via your browser)
+#   Backend connects: postgres:5432 (database via Docker network)

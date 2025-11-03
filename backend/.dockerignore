@@ -1,0 +1,66 @@
+# ============================================
+# Backend .dockerignore
+# ============================================
+# Similar to .gitignore but for Docker builds
+# Files/folders listed here won't be copied to the Docker image
+
+# WHAT: Ignore node_modules
+# WHY: We'll install fresh dependencies in the container
+#      Copying existing node_modules is:
+#      - Slow (lots of files)
+#      - Wrong (may be for different OS - Mac vs Linux)
+#      - Wasteful (we'll install anyway)
+node_modules
+
+# WHAT: Ignore npm logs
+# WHY: Don't need debug logs in production container
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# WHAT: Ignore build output
+# WHY: We'll build inside the container (in Dockerfile)
+#      Don't want old builds from your Mac
+dist
+build
+
+# WHAT: Ignore environment files
+# WHY: Security - don't hardcode secrets in image
+#      We'll provide .env at runtime via docker-compose
+.env
+.env.*
+
+# WHAT: Ignore git files
+# WHY: Don't need git history in production container
+.git
+.gitignore
+
+# WHAT: Ignore test files
+# WHY: Don't need tests in production image
+#      (If you have tests, add them here)
+*.test.ts
+*.spec.ts
+__tests__
+coverage
+
+# WHAT: Ignore IDE files
+# WHY: VS Code settings aren't needed in container
+.vscode
+.idea
+*.swp
+*.swo
+
+# WHAT: Ignore Docker files
+# WHY: Don't need Dockerfile inside the container
+Dockerfile
+.dockerignore
+
+# WHAT: Ignore README
+# WHY: Documentation not needed at runtime
+README.md
+
+# WHAT: Ignore Prisma migrations during build
+# WHY: We'll run migrations separately with docker-compose
+#      Migrations should run AFTER container starts
+# NOTE: We DO copy prisma/schema.prisma (needed for Prisma Client)
+prisma/migrations

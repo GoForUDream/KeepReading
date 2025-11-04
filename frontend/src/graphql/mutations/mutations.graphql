@@ -1,0 +1,100 @@
+# WHAT: All GraphQL mutations
+# WHY: Centralized mutation definitions
+# GENERATES: useLoginMutation, useSignupMutation, useCreateBookMutation, etc.
+
+# ========================================
+# AUTH MUTATIONS
+# ========================================
+
+mutation Login($input: LoginInput!) {
+  login(input: $input) {
+    token
+    user {
+      id
+      email
+      fullName
+      role
+    }
+  }
+}
+
+mutation Signup($input: SignupInput!) {
+  signup(input: $input) {
+    token
+    user {
+      id
+      email
+      fullName
+      role
+    }
+  }
+}
+
+# ========================================
+# BOOKS MUTATIONS
+# ========================================
+
+mutation CreateBook($input: CreateBookInput!) {
+  createBook(input: $input) {
+    id
+    title
+    author
+    price
+    isbn
+    category
+    stock
+  }
+}
+
+mutation UpdateBook($id: ID!, $input: UpdateBookInput!) {
+  updateBook(id: $id, input: $input) {
+    id
+    title
+    author
+    price
+    isbn
+    category
+    stock
+  }
+}
+
+mutation DeleteBook($id: ID!) {
+  deleteBook(id: $id) {
+    id
+    title
+  }
+}
+
+# ========================================
+# CATEGORIES MUTATIONS
+# ========================================
+
+mutation CreateCategory($input: CreateCategoryInput!) {
+  createCategory(input: $input) {
+    id
+    name
+    slug
+  }
+}
+
+mutation DeleteCategory($id: ID!) {
+  deleteCategory(id: $id) {
+    id
+    name
+  }
+}
+
+# ========================================
+# USERS MUTATIONS
+# ========================================
+
+mutation UpdateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
+    id
+    email
+    fullName
+    address1
+    address2
+    favoriteBookId
+  }
+}

@@ -1,0 +1,151 @@
+# WHAT: All GraphQL queries
+# WHY: Centralized query definitions
+# GENERATES: useBooksQuery, useBookQuery, useMeQuery, useCategoriesQuery, etc.
+
+# ========================================
+# BOOKS QUERIES
+# ========================================
+
+query Books {
+  books {
+    id
+    title
+    author
+    description
+    price
+    isbn
+    coverImage
+    category
+    stock
+    published
+    createdAt
+    updatedAt
+  }
+}
+
+query Book($id: ID!) {
+  book(id: $id) {
+    id
+    title
+    author
+    description
+    price
+    isbn
+    coverImage
+    category
+    stock
+    published
+    createdAt
+    updatedAt
+  }
+}
+
+query BookByIsbn($isbn: String!) {
+  bookByIsbn(isbn: $isbn) {
+    id
+    title
+    author
+    description
+    price
+    isbn
+    coverImage
+    category
+    stock
+    published
+    createdAt
+    updatedAt
+  }
+}
+
+# ========================================
+# CATEGORIES QUERIES
+# ========================================
+
+query Categories {
+  categories {
+    id
+    name
+    slug
+    createdAt
+    updatedAt
+  }
+}
+
+query Category($id: ID!) {
+  category(id: $id) {
+    id
+    name
+    slug
+    createdAt
+    updatedAt
+  }
+}
+
+# ========================================
+# USERS QUERIES
+# ========================================
+
+query Me {
+  me {
+    id
+    email
+    fullName
+    role
+    address1
+    address2
+    favoriteBookId
+    favoriteBook {
+      id
+      title
+      author
+      coverImage
+    }
+    createdAt
+    updatedAt
+  }
+}
+
+query MyOrders {
+  myOrders {
+    id
+    totalAmount
+    status
+    createdAt
+    orderItems {
+      id
+      quantity
+      price
+      book {
+        id
+        title
+        author
+        coverImage
+        price
+      }
+    }
+  }
+}
+
+query Users {
+  users {
+    id
+    email
+    fullName
+    role
+    createdAt
+  }
+}
+
+query User($id: ID!) {
+  user(id: $id) {
+    id
+    email
+    fullName
+    role
+    address1
+    address2
+    favoriteBookId
+    createdAt
+    updatedAt
+  }
+}

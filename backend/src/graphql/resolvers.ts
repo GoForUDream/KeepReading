@@ -1,91 +1,34 @@
-import { PrismaClient } from '@prisma/client';
+import { booksResolvers } from '../features/books/index.js';
+import { categoriesResolvers } from '../features/categories/index.js';
+import { authResolvers } from '../features/auth/index.js';
+import { usersResolvers } from '../features/users/index.js';
 
-const prisma = new PrismaClient();
+/**
+ * WHAT: Combined GraphQL Resolvers
+ * WHY: Merges all feature resolvers into a single resolver object
+ * HOW: Spreads Query and Mutation resolvers from each feature
+ *
+ * ARCHITECTURE:
+ * - Feature-based organization (books, categories, auth, users)
+ * - Each feature has its own service layer and resolvers
+ * - This file acts as the aggregation point
+ *
+ * BENEFITS:
+ * - Scalability: Easy to add new features
+ * - Maintainability: Each feature is self-contained
+ * - Testability: Features can be tested in isolation
+ */
 
 export const resolvers = {
   Query: {
-    books: async () => {
-      return await prisma.book.findMany({
-        orderBy: { createdAt: 'desc' },
-      });
-    },
-    book: async (_: any, { id }: { id: string }) => {
-      return await prisma.book.findUnique({
-        where: { id },
-      });
-    },
-    bookByIsbn: async (_: any, { isbn }: { isbn: string }) => {
-      return await prisma.book.findUnique({
-        where: { isbn },
-      });
-    },
-    categories: async () => {
-      return await prisma.category.findMany({
-        orderBy: { name: 'asc' },
-      });
-    },
-    category: async (_: any, { id }: { id: string }) => {
-      return await prisma.category.findUnique({
-        where: { id },
-      });
-    },
-    customers: async () => {
-      return await prisma.customer.findMany({
-        orderBy: { createdAt: 'desc' },
-      });
-    },
-    customer: async (_: any, { id }: { id: string }) => {
-      return await prisma.customer.findUnique({
-        where: { id },
-      });
-    },
+    ...booksResolvers.Query,
+    ...categoriesResolvers.Query,
+    ...usersResolvers.Query,
   },
-
   Mutation: {
-    createBook: async (_: any, { input }: { input: any }) => {
-      return await prisma.book.create({
-        data: {
-          ...input,
-          published: new Date(input.published),
-        },
-      });
-    },
-    updateBook: async (_: any, { id, input }: { id: string; input: any }) => {
-      const data: any = { ...input };
-      if (input.published) {
-        data.published = new Date(input.published);
-      }
-      return await prisma.book.update({
-        where: { id },
-        data,
-      });
-    },
-    deleteBook: async (_: any, { id }: { id: string }) => {
-      return await prisma.book.delete({
-        where: { id },
-      });
-    },
-    createCategory: async (_: any, { input }: { input: any }) => {
-      return await prisma.category.create({
-        data: input,
-      });
-    },
-    deleteCategory: async (_: any, { id }: { id: string }) => {
-      return await prisma.category.delete({
-        where: { id },
-      });
-    },
-    createCustomer: async (_: any, { input }: { input: any }) => {
-      return await prisma.customer.create({
-        data: input,
-      });
-    },
-    deleteCustomer: async (_: any, { id }: { id: string }) => {
-      return await prisma.customer.delete({
-        where: { id },
-      });
-    },
+    ...booksResolvers.Mutation,
+    ...categoriesResolvers.Mutation,
+    ...authResolvers.Mutation,
+    ...usersResolvers.Mutation,
   },
 };
-
-export { prisma };

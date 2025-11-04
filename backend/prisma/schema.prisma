@@ -3,7 +3,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -12,18 +12,20 @@ datasource db {
 }
 
 model Book {
-  id          String   @id @default(uuid())
-  title       String
-  author      String
-  description String?
-  price       Float
-  isbn        String   @unique
-  coverImage  String?
-  category    String
-  stock       Int      @default(0)
-  published   DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String      @id @default(uuid())
+  title          String
+  author         String
+  description    String?
+  price          Float
+  isbn           String      @unique
+  coverImage     String?
+  category       String
+  stock          Int         @default(0)
+  published      DateTime
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  orderItems     OrderItem[]
+  favoritedBy    User[]
 
   @@map("books")
 }
@@ -38,14 +40,59 @@ model Category {
   @@map("categories")
 }
 
-model Customer {
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password       String
+  role           UserRole  @default(USER)
+  fullName       String
+  address1       String?
+  address2       String?
+  favoriteBookId String?
+  favoriteBook   Book?     @relation(fields: [favoriteBookId], references: [id], onDelete: SetNull)
+  orders         Order[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+  totalAmount Float
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
   id        String   @id @default(uuid())
-  email     String   @unique
-  firstName String
-  lastName  String
-  phone     String?
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  quantity  Int
+  price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("customers")
+  @@map("order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }

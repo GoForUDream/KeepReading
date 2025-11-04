@@ -26,6 +26,8 @@ A full-stack bookstore application built with modern technologies.
 ### DevOps
 
 - Docker & Docker Compose
+- GraphQL Code Generator
+- GitHub Actions CI/CD
 - ESLint
 - npm Workspaces
 
@@ -114,6 +116,7 @@ This script will automatically:
 - Install all dependencies
 - Generate Prisma Client
 - Run database migrations
+- Generate GraphQL types (runs automatically via postinstall)
 
 ### 3. Start the Application
 
@@ -130,6 +133,83 @@ This will start:
 - **GraphQL Playground:** http://localhost:4000/graphql
 
 **Note:** The application automatically runs TypeScript and ESLint validation before starting. The dev servers will only start if all checks pass.
+
+## GraphQL Code Generation
+
+This project uses **GraphQL Code Generator** to automatically generate TypeScript types and React hooks from the GraphQL schema. This eliminates manual type definitions and provides fully typed hooks with features like `onSuccess`, `onError`, and `refetch`.
+
+### How It Works
+
+1. **Backend exports schema**: The GraphQL schema is exported to `backend/schema.graphql`
+2. **Frontend runs codegen**: Types and hooks are generated in `frontend/src/generated/graphql.ts`
+3. **Use typed hooks**: Import hooks like `useLoginMutation()`, `useBooksQuery()`, etc.
+
+### Generated Files
+
+**⚠️ Important:** The `frontend/src/generated/` folder is git-ignored and auto-generated. Never edit these files manually!
+
+### When to Run Codegen
+
+Codegen runs automatically in these scenarios:
+- ✅ After `npm install` (via postinstall hook)
+- ✅ During CI pipeline (before tests and builds)
+- ⚠️ Manually when backend schema changes
+
+### Manual Codegen
+
+If you modify the GraphQL schema or operations, regenerate types:
+
+```bash
+# 1. Export schema from backend
+npm run schema:export --workspace=backend
+
+# 2. Generate types and hooks for frontend
+npm run codegen --workspace=frontend
+```
+
+### Development Workflow
+
+For automatic regeneration during development:
+
+```bash
+npm run codegen:watch --workspace=frontend
+```
+
+### Usage Example
+
+**Before (Manual types):**
+```typescript
+import { useQuery, useMutation } from '@apollo/client';
+
+const { data, loading } = useQuery<{ books: Book[] }>(GET_BOOKS);
+const [login] = useMutation<{ login: AuthResponse }>(LOGIN_MUTATION);
+```
+
+**After (Generated hooks):**
+```typescript
+import { useBooksQuery, useLoginMutation } from '@/generated/graphql';
+
+// ✨ Fully typed, no manual definitions needed
+const { data, loading, refetch } = useBooksQuery();
+
+const [login] = useLoginMutation({
+  onCompleted: (data) => {
+    // data.login.user is fully typed!
+    console.log(data.login.user.email);
+  },
+  onError: (error) => {
+    console.error(error.message);
+  },
+});
+```
+
+### GraphQL Operations
+
+Define queries and mutations in:
+- `frontend/src/graphql/queries/queries.graphql`
+- `frontend/src/graphql/mutations/mutations.graphql`
+
+These files generate typed hooks automatically!
 
 ## Docker Management
 

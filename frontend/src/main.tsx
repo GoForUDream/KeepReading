@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { ApolloProvider } from '@apollo/client';
 import { ConfigProvider } from 'antd';
 import App from './App.tsx';
-import { client } from './apollo/client';
+import { client } from './lib/apollo/client';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

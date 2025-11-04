@@ -127,12 +127,6 @@ services:
     networks:
       - app-network
 
-    # WHAT: Command override for development
-    # WHY: Use dev mode with hot reload instead of production mode
-    # HOW: Overrides CMD from Dockerfile
-    #      tsx watch = TypeScript executor with hot reload
-    command: npx tsx watch src/index.ts
-
   # ==========================================
   # Frontend React App Service
   # ==========================================

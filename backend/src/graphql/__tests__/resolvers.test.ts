@@ -37,11 +37,33 @@ vi.mock('@prisma/client', () => {
 
 // WHAT: Import after mocking
 // WHY: Ensures mock is in place
-import { resolvers, prisma } from '../resolvers'
+import { resolvers } from '../resolvers'
+import { PrismaClient } from '@prisma/client'
 
-// WHAT: Get reference to mocked methods
-// WHY: Need to access them in tests
-const mockPrismaClient = prisma as any
+// WHAT: Get reference to mocked Prisma instance
+// WHY: Need to access mock methods in tests
+const prisma = new PrismaClient()
+const mockPrismaClient = prisma as unknown as {
+  book: {
+    findMany: ReturnType<typeof vi.fn>
+    findUnique: ReturnType<typeof vi.fn>
+    create: ReturnType<typeof vi.fn>
+    update: ReturnType<typeof vi.fn>
+    delete: ReturnType<typeof vi.fn>
+  }
+  category: {
+    findMany: ReturnType<typeof vi.fn>
+    findUnique: ReturnType<typeof vi.fn>
+    create: ReturnType<typeof vi.fn>
+    delete: ReturnType<typeof vi.fn>
+  }
+  customer: {
+    findMany: ReturnType<typeof vi.fn>
+    findUnique: ReturnType<typeof vi.fn>
+    create: ReturnType<typeof vi.fn>
+    delete: ReturnType<typeof vi.fn>
+  }
+}
 
 describe('GraphQL Resolvers', () => {
   beforeEach(() => {

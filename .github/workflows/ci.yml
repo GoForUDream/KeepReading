@@ -54,6 +54,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # WHAT: Export GraphQL schema
+      # WHY: Frontend codegen needs the latest schema
+      # HOW: Runs export-schema script
+      - name: Export GraphQL schema
+        run: npm run schema:export --workspace=backend
+
       # WHAT: Run ESLint
       # WHY: Catch code style issues and potential bugs
       # HOW: Runs lint script from backend package.json
@@ -97,6 +103,18 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      # WHAT: Export GraphQL schema from backend
+      # WHY: Codegen needs the latest schema
+      # HOW: Runs backend export-schema script
+      - name: Export GraphQL schema
+        run: npm run schema:export --workspace=backend
+
+      # WHAT: Generate GraphQL types and hooks
+      # WHY: Frontend needs generated types before type-checking
+      # HOW: Runs graphql-codegen
+      - name: Generate GraphQL types
+        run: npm run codegen --workspace=frontend
 
       # WHAT: Run ESLint
       # WHY: Enforce React best practices and catch errors

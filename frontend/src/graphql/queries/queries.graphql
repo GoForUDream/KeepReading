@@ -91,6 +91,7 @@ query Me {
     email
     fullName
     role
+    phone
     address1
     address2
     favoriteBookId
@@ -133,6 +134,7 @@ query Users {
     fullName
     role
     createdAt
+    updatedAt
   }
 }
 

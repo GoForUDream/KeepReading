@@ -46,6 +46,7 @@ model User {
   password       String
   role           UserRole  @default(USER)
   fullName       String
+  phone          String?
   address1       String?
   address2       String?
   favoriteBookId String?

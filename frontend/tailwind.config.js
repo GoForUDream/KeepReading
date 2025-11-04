@@ -5,7 +5,14 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        // EB Garamond - Classic bookstore typography
+        // Used throughout the entire app for that elegant, old-world bookstore feel
+        sans: ['"EB Garamond"', 'serif'],
+        serif: ['"EB Garamond"', 'serif'],
+      },
+    },
   },
   plugins: [],
   corePlugins: {

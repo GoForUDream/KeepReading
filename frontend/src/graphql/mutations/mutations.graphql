@@ -93,8 +93,12 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
     id
     email
     fullName
+    role
+    phone
     address1
     address2
     favoriteBookId
+    createdAt
+    updatedAt
   }
 }

@@ -8,6 +8,7 @@ import { Form, Input, Button, Card, Typography } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useAuthStore } from '@/store/authStore';
 import type { LoginInput } from '@/generated/graphql';
 import { useState } from 'react';
 
@@ -22,7 +23,14 @@ export const LoginForm = () => {
     setLoading(true);
     try {
       await login(values);
-      navigate('/books');
+      // After login, get the user from the store to check their role
+      const loggedInUser = useAuthStore.getState().user;
+
+      if (loggedInUser?.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/books');
+      }
     } catch (error) {
       // Error message handled by AuthContext
     } finally {
@@ -64,7 +72,6 @@ export const LoginForm = () => {
             name="password"
             rules={[
               { required: true, message: 'Please input your password!' },
-              { min: 6, message: 'Password must be at least 6 characters!' },
             ]}
           >
             <Input.Password

@@ -26,6 +26,7 @@ export class UsersService {
         email: true,
         fullName: true,
         role: true,
+        phone: true,
         address1: true,
         address2: true,
         favoriteBookId: true,
@@ -47,6 +48,7 @@ export class UsersService {
         email: true,
         fullName: true,
         role: true,
+        phone: true,
         address1: true,
         address2: true,
         favoriteBookId: true,
@@ -95,6 +97,7 @@ export class UsersService {
     userId: string,
     input: {
       fullName?: string;
+      phone?: string;
       address1?: string;
       address2?: string;
       favoriteBookId?: string;
@@ -108,6 +111,7 @@ export class UsersService {
         email: true,
         fullName: true,
         role: true,
+        phone: true,
         address1: true,
         address2: true,
         favoriteBookId: true,

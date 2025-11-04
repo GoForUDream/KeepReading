@@ -1,90 +1,74 @@
 /**
  * WHAT: Main application header with navigation
- * WHY: Reusable header component with responsive menu
- * HOW: Uses Ant Design Layout.Header and Menu components
+ * WHY: Reusable header component with branding and user actions
+ * HOW: Uses Ant Design Layout.Header with clickable logo and action buttons
  */
 
-import { Layout, Menu, Typography, Button } from 'antd';
-import { BookOutlined, HomeOutlined, ShoppingCartOutlined, UserOutlined, LoginOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Layout, Typography, Button, Badge } from 'antd';
+import { BookOutlined, ShoppingCartOutlined, UserOutlined, LoginOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 
 const { Header: AntHeader } = Layout;
 const { Title } = Typography;
 
 export const Header = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const menuItems = [
-    {
-      key: 'home',
-      icon: <HomeOutlined />,
-      label: <Link to="/">Home</Link>,
-    },
-    {
-      key: 'books',
-      icon: <BookOutlined />,
-      label: <Link to="/books">Books</Link>,
-    },
-    {
-      key: 'cart',
-      icon: <ShoppingCartOutlined />,
-      label: 'Cart',
-    },
-  ];
-
   return (
-    <AntHeader className="flex items-center justify-between">
-      <div className="flex items-center">
-        <BookOutlined className="text-white text-2xl mr-3" />
-        <Title level={3} className="!text-white !mb-0">
+    <AntHeader className="flex items-center justify-between px-6">
+      {/* Left side: Logo and Name - clickable to navigate home */}
+      <div
+        className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => navigate('/')}
+        style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
+      >
+        <BookOutlined style={{ fontSize: '32px', color: 'white', display: 'flex' }} />
+        <Title level={3} style={{ color: 'white', margin: 0, lineHeight: '32px' }}>
           Keep Reading
         </Title>
       </div>
 
-      <div className="flex items-center gap-4">
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={['home']}
-          className="flex-1"
-          items={menuItems}
-        />
-
+      {/* Right side: Account and Cart */}
+      <div className="flex items-center gap-3">
+        {/* User Account or Login */}
         {user ? (
-          <div className="flex items-center gap-3">
-            <Button
-              type="text"
-              icon={<UserOutlined />}
-              className="text-white hover:!text-blue-300"
-              onClick={() => navigate('/profile')}
-            >
-              {user.fullName}
-            </Button>
-            <Button
-              type="text"
-              icon={<LogoutOutlined />}
-              className="text-white hover:!text-red-300"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
-          </div>
+          <Button
+            type="text"
+            size="large"
+            icon={<UserOutlined style={{ fontSize: '20px' }} />}
+            className="text-white hover:!text-blue-300"
+            style={{ display: 'flex', alignItems: 'center' }}
+            onClick={() => navigate('/profile')}
+          >
+            {user.fullName}
+          </Button>
         ) : (
           <Button
             type="primary"
-            icon={<LoginOutlined />}
+            size="large"
+            icon={<LoginOutlined style={{ fontSize: '20px' }} />}
+            style={{ display: 'flex', alignItems: 'center' }}
             onClick={() => navigate('/login')}
           >
             Login
           </Button>
         )}
+
+        {/* Cart */}
+        <Button
+          type="text"
+          size="large"
+          icon={
+            <Badge count={0} showZero={false}>
+              <ShoppingCartOutlined style={{ fontSize: '20px', color: 'white' }} />
+            </Badge>
+          }
+          className="hover:!text-blue-300"
+          style={{ display: 'flex', alignItems: 'center' }}
+          onClick={() => navigate('/cart')}
+        />
       </div>
     </AntHeader>
   );

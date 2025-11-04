@@ -24,14 +24,61 @@ export const typeDefs = gql`
     updatedAt: String!
   }
 
-  type Customer {
+  type User {
     id: ID!
     email: String!
-    firstName: String!
-    lastName: String!
-    phone: String
+    fullName: String!
+    role: String!
+    address1: String
+    address2: String
+    favoriteBookId: String
+    favoriteBook: Book
     createdAt: String!
     updatedAt: String!
+  }
+
+  type AuthResponse {
+    token: String!
+    user: User!
+  }
+
+  type OrderItem {
+    id: ID!
+    bookId: String!
+    book: Book!
+    quantity: Int!
+    price: Float!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  type Order {
+    id: ID!
+    userId: String!
+    user: User!
+    orderItems: [OrderItem!]!
+    totalAmount: Float!
+    status: String!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  input SignupInput {
+    email: String!
+    password: String!
+    fullName: String!
+  }
+
+  input LoginInput {
+    email: String!
+    password: String!
+  }
+
+  input UpdateProfileInput {
+    fullName: String
+    address1: String
+    address2: String
+    favoriteBookId: String
   }
 
   input CreateBookInput {
@@ -63,30 +110,39 @@ export const typeDefs = gql`
     slug: String!
   }
 
-  input CreateCustomerInput {
-    email: String!
-    firstName: String!
-    lastName: String!
-    phone: String
-  }
-
   type Query {
+    # Books
     books: [Book!]!
     book(id: ID!): Book
     bookByIsbn(isbn: String!): Book
+
+    # Categories
     categories: [Category!]!
     category(id: ID!): Category
-    customers: [Customer!]!
-    customer(id: ID!): Customer
+
+    # Users (admin only for users query)
+    users: [User!]!
+    user(id: ID!): User
+    me: User
+    myOrders: [Order!]!
   }
 
   type Mutation {
+    # Authentication
+    signup(input: SignupInput!): AuthResponse!
+    login(input: LoginInput!): AuthResponse!
+
+    # Books
     createBook(input: CreateBookInput!): Book!
     updateBook(id: ID!, input: UpdateBookInput!): Book!
     deleteBook(id: ID!): Book!
+
+    # Categories
     createCategory(input: CreateCategoryInput!): Category!
     deleteCategory(id: ID!): Category!
-    createCustomer(input: CreateCustomerInput!): Customer!
-    deleteCustomer(id: ID!): Customer!
+
+    # Users
+    updateProfile(input: UpdateProfileInput!): User!
+    deleteUser(id: ID!): User!
   }
 `;

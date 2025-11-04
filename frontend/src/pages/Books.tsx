@@ -1,25 +1,11 @@
-import { useQuery } from '@apollo/client';
 import { Card, Row, Col, Typography, Spin, Alert, Button, Tag } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { GET_BOOKS } from '../graphql/queries';
+import { useBooksQuery } from '@/generated/graphql';
 
 const { Title, Paragraph, Text } = Typography;
 
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  description: string;
-  price: number;
-  isbn: string;
-  coverImage: string;
-  category: string;
-  stock: number;
-  published: string;
-}
-
 function Books() {
-  const { loading, error, data } = useQuery(GET_BOOKS);
+  const { loading, error, data } = useBooksQuery();
 
   if (loading) {
     return (
@@ -40,7 +26,7 @@ function Books() {
     );
   }
 
-  const books: Book[] = data?.books || [];
+  const books = data?.books || [];
 
   return (
     <div>

@@ -2,15 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global font styling - EB Garamond for elegant bookstore feel */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'EB Garamond', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Apply EB Garamond to all elements */
+* {
+  font-family: 'EB Garamond', serif;
+}
+
+/* Code elements can keep monospace */
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

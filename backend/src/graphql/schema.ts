@@ -29,6 +29,7 @@ export const typeDefs = gql`
     email: String!
     fullName: String!
     role: String!
+    phone: String
     address1: String
     address2: String
     favoriteBookId: String
@@ -76,6 +77,7 @@ export const typeDefs = gql`
 
   input UpdateProfileInput {
     fullName: String
+    phone: String
     address1: String
     address2: String
     favoriteBookId: String

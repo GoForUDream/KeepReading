@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (input: LoginInput) => Promise<void>;
   signup: (input: SignupInput) => Promise<void>;
   logout: () => void;
+  updateUser: (updatedUser: User) => void;
 }
 
 export const useAuth = (): AuthContextType => {

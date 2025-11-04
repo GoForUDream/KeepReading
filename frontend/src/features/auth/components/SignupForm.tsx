@@ -22,6 +22,7 @@ export const SignupForm = () => {
     setLoading(true);
     try {
       // Remove confirmPassword before sending to backend
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...signupData } = values;
       await signup(signupData);
       navigate('/books');
